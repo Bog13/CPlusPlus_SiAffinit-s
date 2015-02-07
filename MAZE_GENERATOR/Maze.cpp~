@@ -1,0 +1,10 @@
+#include "Maze.hpp"
+
+Maze::Maze()
+{
+  std::cout<<"Hello world !";
+}
+
+Maze::~Maze()
+{
+}

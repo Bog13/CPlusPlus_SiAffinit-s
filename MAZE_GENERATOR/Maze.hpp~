@@ -1,0 +1,15 @@
+#ifndef MAZE_HPP
+#define MAZE_HPP
+
+#include <iostream>
+
+class Maze
+{
+public:
+  Maze();
+  ~Maze();
+private:
+  
+};
+
+#endif
