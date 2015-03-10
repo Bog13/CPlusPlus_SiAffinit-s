@@ -1,7 +1,7 @@
 CXX= g++
-CXXFLAGS= -Wall -std=c++11 -g
+CXXFLAGS= -Wall -std=c++11 -g -lsfml-graphics -lsfml-window -lsfml-system
 EXEC= maze
-SRC= maze.cpp Maze.cpp
+SRC= *.cpp 
 OBJ= $(SRC:.c=.o)
 
 $(EXEC): $(OBJ)
