@@ -150,8 +150,6 @@ namespace MazeGenerator
       }
 
 
-    int ok = 3;
-
     while( edges.size() > 0 )
       {
 	/* find the minimum weight */
@@ -173,16 +171,11 @@ namespace MazeGenerator
 	  }
 
 	/* remove min edge */
+	delete edge_min;
 	edges.erase(edges.begin() + weight_min);
 	
-	ok --;
       }
 
-    /* free edges */
-    for( Edge* e: edges )
-      {
-	delete e;
-      }
 
     /* free trees */
     for( Tree* t: trees )

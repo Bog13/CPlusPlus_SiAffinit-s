@@ -7,9 +7,9 @@ using namespace std;
 using namespace sf;
 using namespace MazeGenerator;
 #define INTERFACE
-#define CELL_WIDTH 32
+#define CELL_WIDTH 16
 #define CELL_HEIGHT CELL_WIDTH
-#define N 20
+#define N 50
 
 void addVertexArray(vector<VertexArray*> &vec, int x,int y, int w, int h, Color c);
 void destroyVertexArray(vector<VertexArray*> &vec);
