@@ -1,0 +1,13 @@
+#include <Tree.hpp>
+namespace MazeGenerator
+{
+  Tree::Tree()
+  {
+    
+  }
+
+  Tree::~Tree()
+  {
+    
+  }
+}

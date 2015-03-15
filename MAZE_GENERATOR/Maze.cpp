@@ -1,6 +1,9 @@
-#include "Maze.hpp"
+#include <Maze.hpp>
+#include <Tree.hpp>
 #include <cstdlib>
-
+#include <random>
+#include <chrono>
+#include <map>
 namespace MazeGenerator
 {
   
@@ -31,7 +34,8 @@ namespace MazeGenerator
 		m_cells[i][j].border[k] = true;
 	      }
 
-	    m_cells[i][j].visited = false;
+	    m_cells[i][j].i = i;
+	    m_cells[i][j].j = j;
 			
 	  }
       }
@@ -63,208 +67,128 @@ namespace MazeGenerator
     std::cout<<"\n";
   }
 
-  size_t Maze::openAWall(size_t i, size_t j)
+  void Maze::connect(size_t i1, size_t j1, size_t i2, size_t j2)
   {
-    std::cout<<"NEW\n";
-    int nb_wall = 4;
-    size_t wall = Maze::random(0,4);
-    std::cout<<"Starting wall: "<<wall<<std::endl;
+    assert( (abs(i1 - i2) == 1) || (abs(j1 - j2) == 1) );
+    assert(i1 >= 0);
+    assert(i1 < ROW);
+    assert(i2 >= 0);
+    assert(i2 < ROW);
+    assert(j1 >= 0);
+    assert(j1 < COLUMN);
+    assert(j2 >= 0);
+    assert(j2 < COLUMN);
     
-    while(m_cells[i][j].border[wall] == false)
+    //up
+    if( i1 + 1 == i2 )
       {
-	std::cout<<"Trying wall number "<<wall<<"\n";
-	nb_wall--;
-	wall += 1;
-	wall %= 4;
+	m_cells[i1][j1].border[1] = false;
+	m_cells[i2][j2].border[0] = false;
+      }
+    //down
+    else if( i1 - 1 == i2 )
+      {
+	m_cells[i1][j1].border[0] = false;
+	m_cells[i2][j2].border[1] = false;
+      }
+    //left
+    else if( j1 + 1 == j2 )
+      {
+	m_cells[i1][j1].border[3] = false;
+	m_cells[i2][j2].border[2] = false;
+      }
+    //right
+    else if( j1 - 1 == j2 )
+      {
+	m_cells[i1][j1].border[2] = false;
+	m_cells[i2][j2].border[3] = false;
       }
 
-    if( m_cells[i][j].border[wall] == true )
-      {
-	m_cells[i][j].border[wall] = false;
-	return wall;
-      }
-    
-    
-    return 4;
   }
 
-  std::vector<std::pair<size_t,size_t>*> Maze::getNeighbor(size_t a, size_t b)
+  void Maze::connect(Cell* c1, Cell *c2)
   {
-    std::vector<std::pair<size_t,size_t> *> vec;
-
-    size_t i = a+1;
-    size_t j = b;
-    if( (size_t)i>=0 && (size_t)i< COLUMN && (size_t)j>=0 && (size_t)j<ROW && m_cells[i][j].visited==false)
-      {
-	std::pair<size_t,size_t> *coord = new std::pair<size_t, size_t>(i,j);
-	vec.push_back(coord);
-      }
-
-    i = a-1;
-    j = b;
-    if( (size_t)i>=0 && (size_t)i< COLUMN && (size_t)j>=0 && (size_t)j<ROW && m_cells[i][j].visited==false )
-      {
-	std::pair<size_t,size_t> *coord = new std::pair<size_t, size_t>(i,j);
-	vec.push_back(coord);
-      }
-
-    i = a;
-    j = b+1;
-    if( (size_t)i>=0 && (size_t)i< COLUMN && (size_t)j>=0 && (size_t)j<ROW && m_cells[i][j].visited==false )
-      {
-	std::pair<size_t,size_t> *coord = new std::pair<size_t, size_t>(i,j);
-	vec.push_back(coord);
-      }
-
-    i = a;
-    j = b-1;
-    if( (size_t)i>=0 && (size_t)i< COLUMN && (size_t)j>=0 && (size_t)j<ROW && m_cells[i][j].visited==false )
-      {
-	std::pair<size_t,size_t> *coord = new std::pair<size_t, size_t>(i,j);
-	vec.push_back(coord);
-      }
-
-    return vec;
+    connect(c1->i, c1->j, c2->i, c2->j);
   }
-
-  std::pair<size_t,size_t> Maze::connect(size_t i, size_t j)
-  {
-    std::vector<std::pair<size_t,size_t> *> neighbor = getNeighbor(i,j);
-
-    //check if we have neighbor
-    if( neighbor.size() == 0 )
-      {
-	std::pair<size_t,size_t> error(-1,-1);
-	return error;
-	
-      }
-    
-    //get a random coordinate and delete the others
-    std::pair<size_t,size_t> *ptr_coord = neighbor[ Maze::random(0,neighbor.size()) ];
-    std::pair<size_t, size_t> coord(*ptr_coord);
-    for(size_t k = 0; k<neighbor.size(); k++){ delete neighbor[k]; }
-    
-    //compute difference between i j and first second
-    int di, dj;
-    di = i - coord.first;
-    dj = j - coord.second;
-
-    //find the walls to open
-    size_t wall_to_open = -1;
-    size_t opposite_wall;
-    
-    if( di == 1 ){ wall_to_open = 0; }
-    if( di == -1 ){ wall_to_open = 1; }
-    if( dj == 1 ){ wall_to_open = 2; }
-    if( dj == -1 ){ wall_to_open = 3; }
-      
-    switch(wall_to_open)
-      {
-      case 0: opposite_wall = 1; break;
-      case 1: opposite_wall = 0; break;
-      case 2: opposite_wall = 3; break;
-      case 3: opposite_wall = 2; break;
-      }
-    
-    m_cells[i][j].border[wall_to_open] = false;
-    m_cells[coord.first][coord.second].border[opposite_wall] = false;
-    
-    /*
-      wall index
-    0
-  2   3
-    1
-    */
-
-    return coord;
-  }
-
   
   void Maze::compute()
-  {/*
-    do
-      {
-	size_t i, j;	  	
-	do
-	  {
-	    i = Maze::random(0,ROW);
-	    j = Maze::random(0,COLUMN);
-	  }
-	while(m_cells[i][j].visited == true);
-	  
-	connect(i,j);
-	m_cells[i][j].visited = true;
-	m_visitedCells++;
-
-      }
-      while(m_visitedCells != NB_CELLS);*/
-
-    std::pair<size_t,size_t> error(-1,-1);
-    std::pair<size_t,size_t> last_good;
-    std::vector<std::pair<size_t,size_t> > history;
+  {
+    std::default_random_engine dre(std::chrono::steady_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<int> distrib(0,100);
     
-    //find a non visited cell
-    size_t i, j;
-    /*
-    do
+    /* creating edges */
+    std::vector<Edge*> edges;
+    std::vector<Tree*> trees;
+    std::map<Cell*, Tree*> m;
+    
+    for(size_t i=0; i<ROW; i++)
       {
-	i = Maze::random(0,ROW);
-	j = Maze::random(0,COLUMN);
-      }
-      while(m_cells[i][j].visited == true);*/
-    i = 0;
-    j = 0;
-	
-    do
-      {
-	std::pair<size_t,size_t> next = connect(i,j);
-
-	m_cells[i][j].visited = true;
-	m_visitedCells++;		
-	
-	//if no neighbor unvisited
-	if(next == error )
+	for(size_t j=0; j<COLUMN; j++)
 	  {
-	    //jump to last good cell/*
-
-	    bool found = false;
+	    Tree* t = new Tree( &m_cells[i][j] );
+	    trees.push_back(t);
+	    m[ &m_cells[i][j] ] = t;
 	    
-	    for(size_t k = history.size()-1; k>0; k--)
+	    if( j + 1 < COLUMN )
 	      {
-		if( getNeighbor(history[k].first, history[k].second).size()>1 )
-		  {
-		    i = history[k].first;
-		    j = history[k].second;
-		    found = true;
-		    break;
-		  }
+		Edge* e = new Edge;
+		e->c1 = &m_cells[i][j];
+		e->c2 = &m_cells[i][j+1];
+		e->weight = distrib(dre);
+		edges.push_back(e);
 	      }
 
-	    if( !found )
-	      {std::cout<<"OK";
-		do
-		  {
-		    i = Maze::random(0,ROW);
-		    j = Maze::random(0,COLUMN);
-		  }
-		while(m_cells[i][j].visited == true);
+	    if( i + 1 < ROW)
+	      {
+		Edge* e = new Edge;
+		e->c1 = &m_cells[i][j];
+		e->c2 = &m_cells[i+1][j];
+		e->weight = distrib(dre);
+		edges.push_back(e);
 	      }
-
 	  }
-	//
-	else
-	  {
-	    history.push_back(next);
-
-	    i = next.first;
-	    j = next.second;
-	  }
-	  
-
       }
-      while(m_visitedCells != NB_CELLS);
 
-    std::cout<<"\tDONE\n";
+
+    int ok = 3;
+
+    while( edges.size() > 0 )
+      {
+	/* find the minimum weight */
+	size_t weight_min = 0;
+	for( size_t i =0; i< edges.size(); i++ )
+	  {
+	    if( edges[i]->weight < edges[weight_min]->weight )
+	      {
+		weight_min = i;
+	      }
+	  }
+
+	/* make connection */
+	Edge* edge_min = edges[weight_min];
+	if( m[edge_min->c1]->Find() != m[edge_min->c2]->Find() )
+	  {
+	    connect(edge_min->c1, edge_min->c2);
+	    m[edge_min->c1]->Union( m[edge_min->c2] );
+	  }
+
+	/* remove min edge */
+	edges.erase(edges.begin() + weight_min);
+	
+	ok --;
+      }
+
+    /* free edges */
+    for( Edge* e: edges )
+      {
+	delete e;
+      }
+
+    /* free trees */
+    for( Tree* t: trees )
+      {
+	delete t;
+      }
   }
 
   Maze::~Maze()

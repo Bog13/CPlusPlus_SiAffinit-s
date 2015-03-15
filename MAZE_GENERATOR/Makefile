@@ -1,5 +1,5 @@
 CXX= g++
-CXXFLAGS= -Wall -std=c++11 -g -lsfml-graphics -lsfml-window -lsfml-system
+CXXFLAGS= -Wall -std=c++11 -g -lsfml-graphics -lsfml-window -lsfml-system -I"./"
 EXEC= maze
 SRC= *.cpp 
 OBJ= $(SRC:.c=.o)

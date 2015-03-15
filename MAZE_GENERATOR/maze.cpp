@@ -7,9 +7,9 @@ using namespace std;
 using namespace sf;
 using namespace MazeGenerator;
 #define INTERFACE
-#define CELL_WIDTH 8
+#define CELL_WIDTH 32
 #define CELL_HEIGHT CELL_WIDTH
-#define N 50
+#define N 20
 
 void addVertexArray(vector<VertexArray*> &vec, int x,int y, int w, int h, Color c);
 void destroyVertexArray(vector<VertexArray*> &vec);
@@ -115,10 +115,6 @@ void createVertexArray(vector<VertexArray*> &vec, Maze const& maze)
 	{
 	  //center
 	  Color c = Color(100,100,150);
-	  if( maze.get(i,j)->visited == true)
-	    {
-	      //c = Color(100,100,200);
-	    }
 	  
 	  addVertexArray(vec,j*CELL_WIDTH,i*CELL_HEIGHT,CELL_WIDTH,CELL_HEIGHT, c);
 	  

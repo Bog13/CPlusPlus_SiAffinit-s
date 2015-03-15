@@ -10,8 +10,17 @@ namespace MazeGenerator
 {
   struct Cell
   {
-    bool visited;
+    size_t i;
+    size_t j;
     bool border[4];
+  };
+
+  struct Edge
+  {
+    Cell *c1;
+    Cell *c2;
+
+    int weight;
   };
 
   class Maze
@@ -20,14 +29,12 @@ namespace MazeGenerator
     Maze(size_t row, size_t column);
 
     Cell* get(size_t i, size_t j) const;
+    void connect(size_t i1, size_t j1, size_t i2, size_t j2);
+    void connect(Cell* c1, Cell *c2);
     void compute();
     void display() const;
-    size_t openAWall(size_t i, size_t j);
     static int random(int a,int b);
 
-    std::vector<std::pair<size_t,size_t> *> getNeighbor(size_t a, size_t b);
-    std::pair<size_t,size_t> connect(size_t i, size_t j);
-    
     ~Maze();
   
   private:
